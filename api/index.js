@@ -19,19 +19,29 @@ app.post('/upload', upload.single('file'), (req, res) => {
         .on('data', (data) => results.push(data))
         .on('end', () => {
             // Validate the CSV file columns
-            /* if (results.length === 0 || !validateCSVColumns(Object.keys(results[0]))) {
+            if (results.length === 0 || !validateCSVColumns(Object.keys(results[0]))) {
                 return res.status(400).send('Invalid CSV format. Please ensure you have the correct columns.');
-            } */
+            } 
             successMsg = 'File uploaded and validated successfully!';
-            console.log(successMsg);
+            console.log( successMsg );
             res.send( {successMsg} );
         });
 });
 
-function validateCSVColumns(columns) {
-    const requiredColumns = ['Employee_ID', 'Company', 'Industry', 'Work Hours', 'Vacation Hours'];
-    return requiredColumns.every(col => columns.includes(col));
+function validateCSVColumns(csvColumns) {
+    csvColumns = csvColumns.map(column => column.trim());
+
+    const requiredColumns = ['Employee_ID'];
+
+    for (let requiredCol of requiredColumns) {
+        console.log(`Checking for ${requiredCol}:`, csvColumns.includes(requiredCol));
+        if (!csvColumns.includes(requiredCol)) {
+            return false;
+        }
+    }
+    return true;
 }
+
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}/`);
