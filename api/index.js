@@ -9,6 +9,7 @@ const port = 8080;
 const upload = multer({ dest: 'uploads/' });
 
 app.post('/upload', upload.single('file'), (req, res) => {
+    console.log('endpoint is called...', req)
     const results = [];
     fs.createReadStream(req.file.path)
         .pipe(csv())

@@ -17,15 +17,75 @@
 </template>
 
 <script>
+import Papa from 'papaparse';
+
 export default {
+  data() {
+    return {
+      csvFile: null,
+    };
+  },
   methods: {
     handleFileUpload(event) {
-      // TODO: Implement the file handling logic here
       console.log("File selected:", event.target.files[0]);
+      this.csvFile = event.target.files[0];
+    },
+    validateCSV(file) {
+      if (!file | !file.data | !file.data[0]){ return false; }
+      const columns = file.data[0];
+
+      const requiredColumns = [
+        "Employee_ID",
+        "Company",
+        "Industry",
+        "Work Hours",
+        "Vacation Hours",
+      ];
+
+      console.log(columns)
+      
+
+      return requiredColumns.every((col) => columns.includes(col));
     },
     submitCSV() {
-      // TODO: Implement the API call to the backend to submit the CSV
-      console.log("Submitting CSV to the backend...");
+      console.log(this.csvFile)
+      if (!this.csvFile) return;
+
+      if (this.csvFile.type != "text/csv"){
+        console.error('this is not a csv file')
+        return
+      }
+      
+
+      Papa.parse(this.csvFile, {
+        complete: (results) => {
+          if (!this.validateCSV(results)) {
+            alert("Invalid CSV format. Please ensure you have the required columns.");
+            return;
+          }
+
+          // Make API call to the backend with the validated data
+         
+          const apiUrl = import.meta.env.VITE_API_HOST || "http://localhost:8080";
+
+          const formData = new FormData();
+          formData.append("csv", this.csvFile);
+
+          fetch(`${apiUrl}/upload`, {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              alert("Successfully uploaded!");
+            })
+            .catch((error) => {
+              console.error("Error uploading CSV:", error);
+              alert("Error uploading CSV. Please try again.");
+            });
+        },
+      });
     },
   },
 };
