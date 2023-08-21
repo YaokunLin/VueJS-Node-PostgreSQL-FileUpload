@@ -31,7 +31,7 @@ export default {
       this.csvFile = event.target.files[0];
     },
     validateCSV(file) {
-      if (!file | !file.data | !file.data[0]){ return false; }
+      if (!file || !file.data || !file.data[0]) return false;
       const columns = file.data[0];
 
       const requiredColumns = [
@@ -42,20 +42,17 @@ export default {
         "Vacation Hours",
       ];
 
-      console.log(columns)
-      
+      console.log(columns);
 
       return requiredColumns.every((col) => columns.includes(col));
     },
     submitCSV() {
-      console.log(this.csvFile)
       if (!this.csvFile) return;
 
-      if (this.csvFile.type != "text/csv"){
-        console.error('this is not a csv file')
-        return
+      if (this.csvFile.type !== "text/csv") {
+        console.error("This is not a csv file");
+        return;
       }
-      
 
       Papa.parse(this.csvFile, {
         complete: (results) => {
@@ -64,12 +61,10 @@ export default {
             return;
           }
 
-          // Make API call to the backend with the validated data
-         
           const apiUrl = import.meta.env.VITE_API_HOST || "http://localhost:8080";
 
           const formData = new FormData();
-          formData.append("csv", this.csvFile);
+          formData.append("file", this.csvFile);  // Use 'file' instead of 'csv'
 
           fetch(`${apiUrl}/upload`, {
             method: "POST",
