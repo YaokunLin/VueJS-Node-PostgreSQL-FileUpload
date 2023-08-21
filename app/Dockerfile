@@ -22,8 +22,11 @@ FROM nginx:alpine
 # Copy the built files from the build stage to the nginx html directory
 COPY --from=build /usr/src/app/dist/ /usr/share/nginx/html
 
-# Expose port 80
-EXPOSE 80
+# Copy the custom Nginx configuration into the container
+COPY app/nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 3001
+EXPOSE 3001
 
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
