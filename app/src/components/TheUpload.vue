@@ -1,18 +1,28 @@
 <template>
   <div>
-    <h2>Enter Data</h2>
-    <p>
-      Please upload a CSV file from your local machine. Ensure that the CSV file includes the following columns:
-    </p>
-    <ul>
-      <li>Employee ID</li>
-      <li>Company</li>
-      <li>Industry</li>
-      <li>Work Hours</li>
-      <li>Vacation Hours</li>
-    </ul>
-    <input type="file" accept=".csv" @change="handleFileUpload" />
-    <button @click="submitCSV">Upload</button>
+    <div>
+      <h2>Enter Data</h2>
+      <p>
+        Please upload a CSV file from your local machine. Ensure that the CSV file includes the following columns:
+      </p>
+      <ul>
+        <li>Employee ID</li>
+        <li>Company</li>
+        <li>Industry</li>
+        <li>Work Hours</li>
+        <li>Vacation Hours</li>
+      </ul>
+      <input type="file" accept=".csv" @change="handleFileUpload" />
+      <button @click="submitCSV">Upload</button>
+    </div>
+   
+    <!-- Display Errors -->
+    <div v-if="errors.length">
+      <h3>Validation Errors:</h3>
+      <ul>
+        <li v-for="error in errors" :key="error" style="color: red">{{ error }}</li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -23,6 +33,7 @@ export default {
   data() {
     return {
       csvFile: null,
+      errors: [],
     };
   },
   methods: {
@@ -42,7 +53,8 @@ export default {
         "Vacation Hours",
       ];
 
-      console.log(columns);
+      console.log(file);
+      console.log(requiredColumns.every((col) => columns.includes(col)))
 
       return requiredColumns.every((col) => columns.includes(col));
     },
@@ -64,23 +76,28 @@ export default {
           const apiUrl = import.meta.env.VITE_API_HOST || "http://localhost:8080";
 
           const formData = new FormData();
-          formData.append("file", this.csvFile);  // Use 'file' instead of 'csv'
+          formData.append("csv", this.csvFile); 
 
-          fetch(`${apiUrl}/upload`, {
-            method: "POST",
-            body: formData,
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log(data);
-              alert("Successfully uploaded!");
-            })
-            .catch((error) => {
-              console.error("Error uploading CSV:", error);
-              alert("Error uploading CSV. Please try again.");
-            });
-        },
-      });
+      fetch(`${apiUrl}/upload`, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.errors && data.errors.length) {
+            this.errors = data.errors; // Populate errors array
+            alert("Error uploading CSV. Please try again.");
+          } else {
+            this.errors = []; // Clear errors
+            alert("Successfully uploaded!");
+          }
+        })
+        .catch((error) => {
+          console.error("Error uploading CSV:", error);
+          alert("Error uploading CSV. Please try again.");
+        });
+    },
+  });
     },
   },
 };

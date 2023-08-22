@@ -79,3 +79,6 @@ dist/
 *.swp
 
 .env
+
+upload/*
+
