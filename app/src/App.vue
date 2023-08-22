@@ -1,19 +1,29 @@
 <script setup>
-import TheUpload from './components/TheUpload.vue'
-import Reports from './components/Reports.vue'
+  import TheUpload from './components/TheUpload.vue'
+  import Reports from './components/Reports.vue'
 </script>
 
 <template>
   <header>
     <!-- <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" /> -->
-    <Reports />
+    <Reports :data-updated="dataUpdated"/>
   </header>
 
   <main>
     
-    <TheUpload />
+    <TheUpload @upload-success="dataUpdated = true"/>
   </main>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      dataUpdated: false
+    };
+  }
+};
+</script>
 
 <style scoped>
 header {

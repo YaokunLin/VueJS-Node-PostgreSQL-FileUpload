@@ -96,6 +96,7 @@ export default {
       } else {
         this.errors = []; // Clear errors
         alert("Successfully uploaded!");
+        this.$emit('upload-success');
       }
     })
     .catch((error) => {

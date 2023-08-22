@@ -13,24 +13,24 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-
-import { Chart, BarController,PieController, CategoryScale, LinearScale, ArcElement, LineController, BarElement, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { ref, onMounted, watch } from 'vue';
+import { Chart, BarController, PieController, CategoryScale, LinearScale, ArcElement, LineController, BarElement, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
 export default {
-  setup() {
+  props: ['dataUpdated'],
+
+  setup(props) {
     const barChartRef = ref(null);
     const pieChartRef = ref(null);
     const lineChartRef = ref(null);
-
     const apiUrl = import.meta.env.VITE_API_HOST || "http://localhost:8080";
 
-    onMounted(async () => {
-      Chart.register(BarController,PieController, CategoryScale, LinearScale, BarElement, ArcElement, LineController, PointElement, LineElement, Title, Tooltip, Legend);
+    const fetchDataAndUpdateCharts = async () => {
+      Chart.register(BarController, PieController, CategoryScale, LinearScale, BarElement, ArcElement, LineController, PointElement, LineElement, Title, Tooltip, Legend);
+      
       try {
         const response = await fetch(`${apiUrl}/reports`);
         const data = await response.json();
-        console.log(data);
 
         const labels = data.map((entry) => entry.industry);
 
@@ -92,6 +92,16 @@ export default {
       } catch (error) {
         console.error("Failed to fetch report data:", error);
       }
+    };
+
+    // Fetch data and update charts on component mount
+    onMounted(fetchDataAndUpdateCharts);
+
+    // Watch for changes in dataUpdated prop and refresh charts accordingly
+    watch(() => props.dataUpdated, (newVal) => {
+      if (newVal) {
+        fetchDataAndUpdateCharts();
+      }
     });
 
     return { barChartRef, pieChartRef, lineChartRef };
@@ -100,5 +110,5 @@ export default {
 </script>
 
 <style scoped>
-/* customize styles here */
+/* Customize styles here */
 </style>
