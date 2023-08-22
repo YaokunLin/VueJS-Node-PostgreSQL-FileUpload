@@ -14,6 +14,7 @@ app.use(cors());
 const upload = multer({ dest: 'uploads/' });
 
 app.post('/upload', upload.single('csv'), (req, res) => {
+    console.log('the upload end point is hit')
     const results = [];
     const errors = [];
     let rowIndex = 0; // Initialize a counter for row index
