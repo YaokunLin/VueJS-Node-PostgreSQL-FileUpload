@@ -27,9 +27,9 @@ services:
     container_name: database
     image: postgres:15.4
     environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=pw
-      - POSTGRES_DB=mydb
+      - POSTGRES_USER=twuuser
+      - POSTGRES_PASSWORD=twupw
+      - POSTGRES_DB=twudb
     ports:
       - "5433:5432"
     volumes:

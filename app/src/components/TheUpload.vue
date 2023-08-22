@@ -78,25 +78,35 @@ export default {
           const formData = new FormData();
           formData.append("csv", this.csvFile); 
 
-      fetch(`${apiUrl}/upload`, {
-        method: "POST",
-        body: formData,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.errors && data.errors.length) {
-            this.errors = data.errors; // Populate errors array
-            alert("Error uploading CSV. Please try again.");
-          } else {
-            this.errors = []; // Clear errors
-            alert("Successfully uploaded!");
-          }
-        })
-        .catch((error) => {
-          console.error("Error uploading CSV:", error);
-          alert("Error uploading CSV. Please try again.");
-        });
-    },
+          fetch(`${apiUrl}/upload`, {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => {
+      // Check if the response status is OK
+      if (!response.ok) {
+        throw new Error("Server responded with an error");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data.errors && data.errors.length) {
+        this.errors = data.errors; // Populate errors array
+        alert("Validation Error uploading CSV. Please try again.");
+      } else {
+        this.errors = []; // Clear errors
+        alert("Successfully uploaded!");
+      }
+    })
+    .catch((error) => {
+      console.error("Error uploading CSV:", error);
+      if (error && error.detail) {
+        alert(`Server Error: ${error.detail}`);
+    } else {
+        alert("Server Error uploading CSV. Please try again.");
+    }
+    });
+  }
   });
     },
   },

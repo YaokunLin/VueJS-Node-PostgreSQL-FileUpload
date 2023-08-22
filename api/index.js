@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const csv = require('csv-parser');
 const cors = require('cors');
+const db = require('./db');
 const fs = require('fs');
 
 
@@ -20,7 +21,6 @@ app.post('/upload', upload.single('csv'), (req, res) => {
     fs.createReadStream(req.file.path)
         .pipe(csv())
         .on('data', (data) => {
-            results.push(data);
         
             // Increment the row index for each row
             rowIndex++;
@@ -30,6 +30,8 @@ app.post('/upload', upload.single('csv'), (req, res) => {
             Object.keys(data).forEach(key => {
                 trimmedData[key.trim()] = data[key];
             });
+
+            results.push(trimmedData);
         
             // Now, you can access the trimmed keys without any issue
             const employeeID = Number(trimmedData['Employee_ID']);
@@ -64,15 +66,31 @@ app.post('/upload', upload.single('csv'), (req, res) => {
                 errors.push(`Row ${rowIndex}: Vacation Hours should be a positive integer.`);
             }
         })
-        .on('end', () => {
-            console.log(errors)
+        .on('end', async () => {
             if (errors.length) {
                 res.status(400).json({ errors });
             } else {
-                res.send({msg: 'File uploaded and validated successfully!'} );
+                try {
+                    // Insert upload timestamp into the uploaded_files table
+                    const { rows } = await db.query("INSERT INTO uploaded_files(upload_time) VALUES(NOW()) RETURNING id");
+                    const fileId = rows[0].id;
+    
+                    // Insert each row of data into the employee_data table
+                    for (const row of results) {
+                        await db.query(`
+                            INSERT INTO employee_data(file_id, employee_id, company, industry, work_hours, vacation_hours, overtime_hours)
+                            VALUES($1, $2, $3, $4, $5, $6, $7)
+                        `, [fileId, row['Employee_ID'], row['Company'], row['Industry'], row['Work Hours'], row['Vacation Hours'], row['Overtime Hours']]);
+                    }
+    
+                    res.send({msg: 'File uploaded and saved to database successfully!'});
+                } catch (err) {
+                    console.error('Database error:', err);
+                    res.status(500).json({ msg: 'Internal server error', detail: err });
+                }
             }
         });
-});
+    });
 
 function validateCSVColumns(csvColumns) {
     csvColumns = csvColumns.map(column => column.trim());
