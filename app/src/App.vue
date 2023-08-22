@@ -1,5 +1,4 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
 import TheUpload from './components/TheUpload.vue'
 import Reports from './components/Reports.vue'
 </script>

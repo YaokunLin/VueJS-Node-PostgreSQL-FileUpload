@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <h2>Enter Data</h2>
+      <h2>Upload Data</h2>
       <p>
         Please upload a CSV file from your local machine. Ensure that the CSV file includes the following columns:
       </p>
