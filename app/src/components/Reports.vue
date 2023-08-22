@@ -24,10 +24,16 @@ export default {
     const pieChartRef = ref(null);
     const lineChartRef = ref(null);
     const apiUrl = import.meta.env.VITE_API_HOST || "http://localhost:8080";
+    let barChart, pieChart, lineChart; // References to chart instances
 
     const fetchDataAndUpdateCharts = async () => {
       Chart.register(BarController, PieController, CategoryScale, LinearScale, BarElement, ArcElement, LineController, PointElement, LineElement, Title, Tooltip, Legend);
-      
+
+      // Destroy existing charts if they exist
+      if (barChart) barChart.destroy();
+      if (pieChart) pieChart.destroy();
+      if (lineChart) lineChart.destroy();
+
       try {
         const response = await fetch(`${apiUrl}/reports`);
         const data = await response.json();
@@ -35,7 +41,7 @@ export default {
         const labels = data.map((entry) => entry.industry);
 
         // Bar Chart
-        new Chart(barChartRef.value, {
+        barChart = new Chart(barChartRef.value, {
           type: 'bar',
           data: {
             labels,
@@ -50,7 +56,7 @@ export default {
         });
 
         // Pie Chart
-        new Chart(pieChartRef.value, {
+        pieChart = new Chart(pieChartRef.value, {
           type: 'pie',
           data: {
             labels,
@@ -75,7 +81,7 @@ export default {
         });
 
         // Line Chart
-        new Chart(lineChartRef.value, {
+        lineChart = new Chart(lineChartRef.value, {
           type: 'line',
           data: {
             labels,
