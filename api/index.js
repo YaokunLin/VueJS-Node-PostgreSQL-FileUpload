@@ -92,6 +92,27 @@ app.post('/upload', upload.single('csv'), (req, res) => {
         });
     });
 
+
+app.get('/reports', async (req, res) => {
+    console.log('the reports end point is hit');
+    try {
+        const result = await db.query(`
+            SELECT 
+                industry,
+                AVG(work_hours) as avg_work_hours,
+                AVG(vacation_hours) as avg_vacation_hours,
+                AVG(overtime_hours) as avg_overtime_hours
+            FROM employee_data
+            GROUP BY industry
+        `);
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ msg: 'Internal server error', detail: err.message });
+    }
+});
+    
+    
 function validateCSVColumns(csvColumns) {
     csvColumns = csvColumns.map(column => column.trim());
 

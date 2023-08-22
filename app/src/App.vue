@@ -1,14 +1,17 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
 import TheUpload from './components/TheUpload.vue'
+import Reports from './components/Reports.vue'
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+    <!-- <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" /> -->
+    <Reports />
   </header>
 
   <main>
+    
     <TheUpload />
   </main>
 </template>
