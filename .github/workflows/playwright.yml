@@ -1,6 +1,15 @@
 name: Playwright Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
 
 concurrency:
   group: playwright-${{ github.workflow }}-${{ github.ref }}
@@ -17,16 +26,18 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '16'
 
-    - name: Navigate to app directory
-      run: cd app
+    - name: Clear npm cache
+      working-directory: app
+      run: npm cache clean --force
 
     - name: Install dependencies
       working-directory: app
       run: npm ci
 
     - name: Build and start server
+      working-directory: app
       run: |
         npm run build
         npm run start & # This starts the server in the background
