@@ -1,0 +1,68 @@
+name: Build and Push Application Images
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - image: ghcr.io/your-username/your-repo-name/api
+            context: .
+            dockerfile: api/Dockerfile
+            name: api
+          - image: ghcr.io/your-username/your-repo-name/app
+            context: .
+            dockerfile: app/Dockerfile
+            name: app
+          # Note: For the database, we'll be using a pre-built image (postgres:15.4). 
+          # Hence, we don't need to build and push it.
+    name: Build ${{ matrix.name }} docker image
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          install: true
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ matrix.image }}
+          tags: |
+            type=sha,format=long,prefix=
+            latest
+            type=ref,event=branch
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ matrix.name }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ matrix.name }}
+      - name: Build and Push image
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
