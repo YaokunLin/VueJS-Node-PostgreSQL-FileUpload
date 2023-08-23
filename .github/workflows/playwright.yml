@@ -1,15 +1,6 @@
 name: Playwright Tests
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-    types:
-      - closed
-
+on: [push]
 
 concurrency:
   group: playwright-${{ github.workflow }}-${{ github.ref }}
