@@ -15,6 +15,7 @@ This guide provides instructions on how to manage the Docker containers for the 
    docker-compose -p twuproject up -d
    ``` 
 This will start the containers in detached mode (running in the background).
+Then you can go to `http://localhost:3001/` and you can try upload the sample csv file called `PayTransparency_TWU_Code _Challenge_Samplefile.csv`
 
 ## Stopping the Containers
 
