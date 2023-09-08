@@ -17,7 +17,7 @@ This guide provides instructions on how to manage the Docker containers for the 
 This will start the containers in detached mode (running in the background).
 Then you can go to [http://localhost:3001/](http://localhost:3001/) and you can try upload the sample csv file called `PayTransparency_TWU_Code _Challenge_Samplefile.csv`, which can be found in the root of the repo directory
 
-[![YouTube Video](https://img.youtube.com/vi/X8H4MhiQa4Y/maxresdefault.jpg)](https://www.youtube.com/watch?v=X8H4MhiQa4Y)
+[![YouTube Video](video_pic.png)](https://www.youtube.com/watch?v=X8H4MhiQa4Y)
 
 
 ## Stopping the Containers
